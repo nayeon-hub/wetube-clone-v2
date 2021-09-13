@@ -1,0 +1,29 @@
+{
+  "name": "wetube-clone-v2",
+  "version": "1.0.0",
+  "description": "wetube clone v2 built using NodeJS, Express,Mongo and ES6",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "babel-node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nayeon-hub/wetube-clone-v2.git"
+  },
+  "author": "nayeon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nayeon-hub/wetube-clone-v2/issues"
+  },
+  "homepage": "https://github.com/nayeon-hub/wetube-clone-v2#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.5",
+    "@babel/node": "^7.15.4",
+    "@babel/preset-env": "^7.15.6",
+    "babel-cli": "^6.26.0"
+  }
+}
