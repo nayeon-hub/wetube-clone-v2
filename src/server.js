@@ -4,15 +4,20 @@ const PORT = 4000;
 
 const app = express();
 
-const gossipMiddleware = (req, res, next) => {
-  console.log(`Someone is going to:${req.url}`);
+const routerLogger = (req, res, next) => {
+  console.log("PATH", req.path);
   next();
 };
 
-app.get("/", gossipMiddleware, (req, res) => {
-  return res.send("I love middleware");
+const methodLogger = (req, res, next) => {
+  console.log("METHOD", req.method);
+  next();
+};
+app.use(methodLogger, routerLogger);
+app.get("/", (req, res) => {
+  console.log("I will respond.");
+  return res.send("Hello");
 });
-
 app.get("/login", (req, res) => {
   return res.send("Login there");
 });
