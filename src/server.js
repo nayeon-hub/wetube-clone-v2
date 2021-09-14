@@ -1,19 +1,13 @@
 import express from "express";
+import morgan from "morgan";
 
 const PORT = 4000;
 
 const app = express();
+const loggerMiddleware = morgan("dev");
 
-const routerLogger = (req, res, next) => {
-  console.log("PATH", req.path);
-  next();
-};
+app.use(loggerMiddleware);
 
-const methodLogger = (req, res, next) => {
-  console.log("METHOD", req.method);
-  next();
-};
-app.use(methodLogger, routerLogger);
 app.get("/", (req, res) => {
   console.log("I will respond.");
   return res.send("Hello");
