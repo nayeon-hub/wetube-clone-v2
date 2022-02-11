@@ -11,12 +11,13 @@ nodeJS를 사용한 유튜브 클론
    /search -> Search
 
 2. User router
-   /users/edit -> Edit user  
-   /users/delete -> Delete user
+   /users/:id -> See user  
+   /users/logout -> Log Out  
+   /users/edit -> Edit My Profile  
+   /users/delete -> Delete My Profile
 
 3. Video router
-   /videos/watch -> Watch Video  
-   /videos/edit -> Edit Video  
-   /videos/delete -> Delete Video  
-   /videos/comments -> Comment on a video  
-   /videos/comments/delete -> Delete A Comment of Video
+   /videos/:id -> See Video  
+   /videos/:id/edit -> Edit Video  
+   /videos/:id/delete -> Delete Video  
+   /videos/upload -> Upload Video
