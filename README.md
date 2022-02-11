@@ -30,3 +30,5 @@ Using Pug
    깔끔한 html 작성
    html에 자바스크립트 포함
    반복을 줄이는 기능이 있음
+
+### relative URL / absolute URL
