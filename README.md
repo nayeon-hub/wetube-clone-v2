@@ -21,3 +21,12 @@ nodeJS를 사용한 유튜브 클론
    /videos/:id/edit -> Edit Video  
    /videos/:id/delete -> Delete Video  
    /videos/upload -> Upload Video
+
+#### template
+
+Using Pug
+
+1. Pug의 장점
+   깔끔한 html 작성
+   html에 자바스크립트 포함
+   반복을 줄이는 기능이 있음
