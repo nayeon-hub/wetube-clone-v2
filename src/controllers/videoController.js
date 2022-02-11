@@ -1,57 +1,35 @@
-import res from "express/lib/response";
+import Video from "../models/Video";
 
-const videos = [
-  {
-    title: "First Video",
-    rating: 5,
-    comments: 2,
-    createdAt: "2 minuts ago",
-    views: 59,
-    id: 1,
-  },
-  {
-    title: "Second Video",
-    rating: 5,
-    comments: 2,
-    createdAt: "2 minuts ago",
-    views: 59,
-    id: 2,
-  },
-  {
-    title: "Third Video",
-    rating: 5,
-    comments: 2,
-    createdAt: "2 minuts ago",
-    views: 59,
-    id: 3,
-  },
-];
+/*
+// This is callback
+console.log("start")
+Video.find({},(error, videos) =>{
+  return res.render("home", {pageTitle : "Home", vidoes});
+});
+*/
 
-export const trendingVideos = (req, res) => {
-  res.render("home", { pageTitle: "Home", videos });
+export const home = async (req, res) => {
+  const videos = await Video.find({});
+  return res.render("home", { pageTitle: "Home", videos });
+  // return을 render옆에 써준 이유는 render 이후 자동되는 function이 없도록 하기 위해서("실수 줄입"), return이 없어도 코드에 문제는 없습니다.
 };
+
 export const watch = (req, res) => {
   const { id } = req.params;
-  const video = videos[id - 1];
-  console.log("Show video", id);
   return res.render("watch", {
-    pageTitle: `Watching :  ${video.title}`,
-    video,
+    pageTitle: `Watching `,
   });
 };
 
 export const getEdit = (req, res) => {
   // painting the form
   const { id } = req.params;
-  const video = videos[id - 1];
-  console.log("Show video", id);
-  return res.render("edit", { pageTitle: `Editing : ${video.title}`, video });
+  return res.render("edit", { pageTitle: `Editing` });
 };
 
 export const postEdit = (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
-  videos[id - 1].title = title;
   return res.redirect(`/videos/${id}`);
 }; // saving the changes
 
@@ -59,17 +37,19 @@ export const getUpload = (req, res) => {
   return res.render("upload", { pageTitle: "Upload Video" });
 };
 
-export const postUpload = (req, res) => {
-  const { title } = req.body;
-  const newVideo = {
+export const postUpload = async (req, res) => {
+  const { title, description, hashtags } = req.body;
+  await Video.create({
     title,
-    rating: 0,
-    comments: 0,
-    createAt: "just now",
-    views: 0,
-    id: videos.length + 1,
-  };
-  videos.push(newVideo);
+    description,
+    createAt: Date.now(),
+    hashtags: `${hashtags.split(",").map((word) => word.replace(" ", ""))}`,
+    meta: {
+      views: 0,
+      rating: 0,
+    },
+  });
+  // await video.save();
   return res.redirect("/"); // browser is taken us
 };
 
