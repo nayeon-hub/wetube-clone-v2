@@ -1,5 +1,10 @@
+const fakeUser = {
+  username: "Nicolas",
+  loggedIn: true,
+}; // just fake object
+
 export const trendingVideos = (req, res) =>
-  res.render("home", { pageTitle: "Home" });
+  res.render("home", { pageTitle: "Home", fakeUser });
 export const see = (req, res) => res.render("watch", { pageTitle: "Watch" });
 
 export const edit = (req, res) => res.render("edit", { pageTitle: "Edit" });
