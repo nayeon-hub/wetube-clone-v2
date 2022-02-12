@@ -1,10 +1,5 @@
 import mongoose from "mongoose";
 
-export const formatHashtags = (hashtags) =>
-  hashtags
-    .split(",")
-    .map((word) => (word.startsWith("#") ? word.trim() : `#${word.trim()}`));
-
 //Schema's power!!!
 const videoSchema = new mongoose.Schema({
   title: { type: String, required: true, trim: true, maxLength: 20 },
@@ -18,11 +13,11 @@ const videoSchema = new mongoose.Schema({
 });
 // made shape of video data
 
-// videoSchema.static("formatHashtags", function (hashtags) {
-//   return hashtags
-//     .split(",")
-//     .map((word) => (word.startsWith("#") ? word.trim() : `#${word.trim()}`));
-// });
+videoSchema.static("formatHashtags", function (hashtags) {
+  return hashtags
+    .split(",")
+    .map((word) => (word.startsWith("#") ? word.trim() : `#${word.trim()}`));
+}); // create static function
 
 const Video = mongoose.model("Video", videoSchema);
 // create data model(name of model , shape of data)

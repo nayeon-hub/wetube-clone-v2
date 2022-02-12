@@ -1,4 +1,4 @@
-import Video, { formatHashtags } from "../models/Video";
+import Video from "../models/Video";
 
 /*
 // This is callback
@@ -9,7 +9,7 @@ Video.find({},(error, videos) =>{
 */
 
 export const home = async (req, res) => {
-  const videos = await Video.find({});
+  const videos = await Video.find({}).sort({ createAt: "desc" });
   return res.render("home", { pageTitle: "Home", videos });
   // return을 render옆에 써준 이유는 render 이후 자동되는 function이 없도록 하기 위해서("실수 줄입"), return이 없어도 코드에 문제는 없습니다.
 };
@@ -51,7 +51,7 @@ export const postEdit = async (req, res) => {
   await Video.findByIdAndUpdate(id, {
     title,
     description,
-    hashtags: formatHashtags(hashtags),
+    hashtags: Video.formatHashtags(hashtags),
   });
 
   return res.redirect(`/videos/${id}`);
@@ -67,7 +67,7 @@ export const postUpload = async (req, res) => {
     await Video.create({
       title,
       description,
-      hashtags: formatHashtags(hashtags),
+      hashtags: Video.formatHashtags(hashtags),
     });
     return res.redirect("/"); // browser is taken us
   } catch (error) {
@@ -78,7 +78,26 @@ export const postUpload = async (req, res) => {
   }
 };
 
-export const deleteVideo = (req, res) => {
-  return res.send("Delete Video");
+export const deleteVideo = async (req, res) => {
+  const { id } = req.params;
+  // delete video
+  await Video.findByIdAndDelete(id);
+  return res.redirect("/");
 };
-export const search = (req, res) => res.send("Search Video");
+
+export const search = async (req, res) => {
+  const { keyword } = req.query;
+  let videos = [];
+  if (keyword) {
+    // search
+    videos = await Video.find({
+      title: {
+        $regex: new RegExp(`${keyword}$`, "i"),
+      },
+    });
+  }
+  return res.render("search", { pageTitle: "Search", videos });
+};
+
+// you should use findOneAndDelete not use Remove
+// findByIdAndDelete(id) is a shorthand for findOneAndDelete({_id : id})
