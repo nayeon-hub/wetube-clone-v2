@@ -1,4 +1,4 @@
-import Video from "../models/Video";
+import Video, { formatHashtags } from "../models/Video";
 
 /*
 // This is callback
@@ -51,7 +51,7 @@ export const postEdit = async (req, res) => {
   await Video.findByIdAndUpdate(id, {
     title,
     description,
-    hashtags,
+    hashtags: formatHashtags(hashtags),
   });
 
   return res.redirect(`/videos/${id}`);
@@ -67,7 +67,7 @@ export const postUpload = async (req, res) => {
     await Video.create({
       title,
       description,
-      hashtags,
+      hashtags: formatHashtags(hashtags),
     });
     return res.redirect("/"); // browser is taken us
   } catch (error) {

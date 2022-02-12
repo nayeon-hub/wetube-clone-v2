@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
 
+export const formatHashtags = (hashtags) =>
+  hashtags
+    .split(",")
+    .map((word) => (word.startsWith("#") ? word.trim() : `#${word.trim()}`));
+
 //Schema's power!!!
 const videoSchema = new mongoose.Schema({
   title: { type: String, required: true, trim: true, maxLength: 20 },
@@ -13,13 +18,11 @@ const videoSchema = new mongoose.Schema({
 });
 // made shape of video data
 
-//first middleware - when : before modle create
-videoSchema.pre("save", async function () {
-  console.log("We are about to save : ", this);
-  this.hashtags = this.hashtags[0]
-    .split(",")
-    .map((word) => (word.startsWith("#") ? word.trim() : `#${word.trim()}`));
-});
+// videoSchema.static("formatHashtags", function (hashtags) {
+//   return hashtags
+//     .split(",")
+//     .map((word) => (word.startsWith("#") ? word.trim() : `#${word.trim()}`));
+// });
 
 const Video = mongoose.model("Video", videoSchema);
 // create data model(name of model , shape of data)
