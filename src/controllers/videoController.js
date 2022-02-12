@@ -14,22 +14,55 @@ export const home = async (req, res) => {
   // return을 render옆에 써준 이유는 render 이후 자동되는 function이 없도록 하기 위해서("실수 줄입"), return이 없어도 코드에 문제는 없습니다.
 };
 
-export const watch = (req, res) => {
+export const watch = async (req, res) => {
   const { id } = req.params;
+  const video = await Video.findById(id); // id로 mongoDB에서 비디오 찾는 함수
+  // const video = await Video.findById(id).exec(); exec 함수는 promise를 반환한다.
+
+  if (!video) {
+    return res.render("404", { pageTitle: "Video not found" });
+  }
   return res.render("watch", {
-    pageTitle: `Watching `,
+    pageTitle: video.title,
+    video,
   });
 };
 
-export const getEdit = (req, res) => {
-  // painting the form
+export const getEdit = async (req, res) => {
   const { id } = req.params;
-  return res.render("edit", { pageTitle: `Editing` });
+  const video = await Video.findById(id);
+
+  if (!video) {
+    return res.render("404", { pageTitle: "Video not found" });
+  }
+  return res.render("edit", {
+    pageTitle: `Edit : ${video.title}`,
+    video,
+  });
 };
 
-export const postEdit = (req, res) => {
+export const postEdit = async (req, res) => {
   const { id } = req.params;
-  const { title } = req.body;
+  const { title, description, hashtags } = req.body;
+  const video = await Video.findById(id);
+  if (!video) {
+    return res.render("404", { pageTitle: "Video not found" });
+  }
+  // await Video.findByIdAndUpdate(id, {
+  //   title,
+  //   description,
+  //   hashtags: hashtags
+  //     .split(",")
+  //     .map((word) => (word.startsWith("#") ? word.trim() : `#${word.trim()}`)),
+  // });
+
+  video.title = title;
+  video.description = description;
+  video.hashtags = hashtags
+    .split(",")
+    .map((word) => (word.startsWith("#") ? word.trim() : `#${word.trim()}`));
+  await video.save();
+
   return res.redirect(`/videos/${id}`);
 }; // saving the changes
 
@@ -43,7 +76,7 @@ export const postUpload = async (req, res) => {
     await Video.create({
       title,
       description,
-      hashtags: `${hashtags.split(",").map((word) => word.replace(" ", ""))}`,
+      hashtags: `${hashtags.split(",").map((word) => `#${word.trim()}`)}`,
     });
     return res.redirect("/"); // browser is taken us
   } catch (error) {
