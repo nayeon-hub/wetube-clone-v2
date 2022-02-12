@@ -13,6 +13,14 @@ const videoSchema = new mongoose.Schema({
 });
 // made shape of video data
 
+//first middleware - when : before modle create
+videoSchema.pre("save", async function () {
+  console.log("We are about to save : ", this);
+  this.hashtags = this.hashtags[0]
+    .split(",")
+    .map((word) => (word.startsWith("#") ? word.trim() : `#${word.trim()}`));
+});
+
 const Video = mongoose.model("Video", videoSchema);
 // create data model(name of model , shape of data)
 

@@ -44,16 +44,14 @@ export const getEdit = async (req, res) => {
 export const postEdit = async (req, res) => {
   const { id } = req.params;
   const { title, description, hashtags } = req.body;
-  const video = await Video.findById(id);
+  const video = await Video.exists({ _id: id }); // id data object를 가져오지 않고 존재 유무만 판단해도 되기에
   if (!video) {
     return res.render("404", { pageTitle: "Video not found" });
   }
   await Video.findByIdAndUpdate(id, {
     title,
     description,
-    hashtags: hashtags
-      .split(",")
-      .map((word) => (word.startsWith("#") ? word.trim() : `#${word.trim()}`)),
+    hashtags,
   });
 
   return res.redirect(`/videos/${id}`);
@@ -69,7 +67,7 @@ export const postUpload = async (req, res) => {
     await Video.create({
       title,
       description,
-      hashtags: `${hashtags.split(",").map((word) => `#${word.trim()}`)}`,
+      hashtags,
     });
     return res.redirect("/"); // browser is taken us
   } catch (error) {
