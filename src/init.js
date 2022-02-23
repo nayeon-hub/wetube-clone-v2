@@ -1,3 +1,4 @@
+import "dotenv/config";
 import "./db"; //db 파일 자체를 import함과 동시에 js에 의해 자동으로 파일이 실행됨
 import "./models/Video";
 import "./models/User";
