@@ -141,6 +141,7 @@ export const finishGithubLogin = async (req, res) => {
     let user = await User.findOne({ email: emailObj.email }); // 일단 db에 이 이메일이 존재하는지 찾는다.
     if (!user) {
       // 만약 db에 github email이 없다면 password 없이 Github 데이터로 user 생성
+      console.log(userData);
       user = await User.create({
         avatarUrl: userData.avatar_url,
         name: userData.name,
@@ -164,6 +165,14 @@ export const logout = (req, res) => {
   req.session.destroy();
   return res.redirect("/");
 };
-export const edit = (req, res) => res.send("Edit User");
+export const getEdit = (req, res) => {
+  return res.render("edit-profile", {
+    pageTitle: "Edit Profile",
+    // user: req.session.user, - res.locals.loggedInUser
+  });
+};
+export const postEdit = (req, res) => {
+  return res.render("edit-profile");
+};
 export const remove = (req, res) => res.send("Remove User");
 export const see = (req, res) => res.send("See User");
