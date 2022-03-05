@@ -1,5 +1,5 @@
 import Video from "../models/Video";
-
+import User from "../models/User";
 /*
 // This is callback
 console.log("start")
@@ -16,13 +16,13 @@ export const home = async (req, res) => {
 
 export const watch = async (req, res) => {
   const { id } = req.params;
-  const video = await Video.findById(id); // id로 mongoDB에서 비디오 찾는 함수
+  const video = await Video.findById(id).populate("owner"); // id로 mongoDB에서 비디오 찾는 함수
   // const video = await Video.findById(id).exec(); exec 함수는 promise를 반환한다.
 
   if (!video) {
     return res.render("404", { pageTitle: "Video not found" });
   }
-  return res.render("watch", {
+  return res.render("videos/watch", {
     pageTitle: video.title,
     video,
   });
@@ -35,7 +35,7 @@ export const getEdit = async (req, res) => {
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found" });
   }
-  return res.render("edit", {
+  return res.render("videos/edit", {
     pageTitle: `Edit : ${video.title}`,
     video,
   });
@@ -54,24 +54,31 @@ export const postEdit = async (req, res) => {
     hashtags: Video.formatHashtags(hashtags),
   });
 
-  return res.redirect(`/videos/${id}`);
+  return res.redirect(`videos/${id}`);
 }; // saving the changes
 
 export const getUpload = (req, res) => {
-  return res.render("upload", { pageTitle: "Upload Video" });
+  return res.render("videos/upload", { pageTitle: "Upload Video" });
 };
 
 export const postUpload = async (req, res) => {
+  const {
+    user: { _id },
+  } = req.session; // session에는 현재 로그인한 user의 정보가 들어있다.
+  const { path: fileUrl } = req.file;
   const { title, description, hashtags } = req.body;
   try {
     await Video.create({
       title,
       description,
+      fileUrl,
+      owner: _id,
       hashtags: Video.formatHashtags(hashtags),
     });
     return res.redirect("/"); // browser is taken us
   } catch (error) {
-    return res.status(400).render("upload", {
+    console.log(error);
+    return res.status(400).render("videos/upload", {
       pageTitle: "Upload Video",
       errorMessage: error._message,
     });
