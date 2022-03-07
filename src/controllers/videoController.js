@@ -30,11 +30,19 @@ export const watch = async (req, res) => {
 
 export const getEdit = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
   const video = await Video.findById(id);
 
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found" });
   }
+
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
+  }
+
   return res.render("videos/edit", {
     pageTitle: `Edit : ${video.title}`,
     video,
@@ -43,18 +51,28 @@ export const getEdit = async (req, res) => {
 
 export const postEdit = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
   const { title, description, hashtags } = req.body;
-  const video = await Video.exists({ _id: id }); // id data object를 가져오지 않고 존재 유무만 판단해도 되기에
+
+  const video = await Video.findById(id);
+  // const video = await Video.exists({ _id: id }); // id data object를 가져오지 않고 존재 유무만 판단해도 되기에
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found" });
   }
+
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
+  }
+
   await Video.findByIdAndUpdate(id, {
     title,
     description,
     hashtags: Video.formatHashtags(hashtags),
   });
 
-  return res.redirect(`videos/${id}`);
+  return res.redirect(`/videos/${id}`);
 }; // saving the changes
 
 export const getUpload = (req, res) => {
@@ -68,13 +86,16 @@ export const postUpload = async (req, res) => {
   const { path: fileUrl } = req.file;
   const { title, description, hashtags } = req.body;
   try {
-    await Video.create({
+    const newVideo = await Video.create({
       title,
       description,
       fileUrl,
-      owner: _id,
+      owner: _id, // upload - 비디오를 업로드하는 유저 저장
       hashtags: Video.formatHashtags(hashtags),
     });
+    const user = await User.findById(_id);
+    user.videos.push(newVideo._id);
+    user.save();
     return res.redirect("/"); // browser is taken us
   } catch (error) {
     console.log(error);
@@ -87,8 +108,26 @@ export const postUpload = async (req, res) => {
 
 export const deleteVideo = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
   // delete video
+
+  const video = await Video.findById(id);
+  const user = await User.findById(_id);
+  // const video = await Video.exists({ _id: id }); // id data object를 가져오지 않고 존재 유무만 판단해도 되기에
+  if (!video) {
+    return res.status(404).render("404", { pageTitle: "Video not found" });
+  }
+
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
+  }
+
   await Video.findByIdAndDelete(id);
+  let videoArr = user.videos.filter((el) => String(el) !== String(id));
+  user.videos = [...videoArr];
+  user.save();
   return res.redirect("/");
 };
 
